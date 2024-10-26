@@ -1,10 +1,5 @@
-import prettytable
+from prettytable import PrettyTable
 import csv
-
-with open("test.csv", encoding='utf_8') as f:
-    mytable = csv.Sniffer().sniff(f.readline())
-    mytable = prettytable.from_csv(mytable.)
-    print(mytable)
 
 dictionary = {
     "name": "Название",
@@ -48,52 +43,69 @@ def сsv_reader(file_name):
             vacancies += [row]
     return (vacancies, titles)
 
-def print_vacancies(vacancies, titles):
+def formatter(vacancies, titles):
+    formatted_vacancies = []
     for vacancy in vacancies:
-        row = {}
-        for (title, info) in zip(titles, vacancy):
-            row[title] = info
+        result = {}
+        salary_from = 0
+        salary_to = 0
+        salary_gross = ""
+        salary_currency = ""
+        for (key, value) in zip(titles, vacancy):
+            value = value.rstrip()
 
-        for key, value in formatter(row).items():
-            print(f"{dictionary[key]}: {value}")
+            match key:
+                case 'key_skills':
+                    result[dictionary[key]] = ', '.join(value.split('\n'))
+                case 'experience_id':
+                    result[dictionary[key]] = work_experience[value]
+                case 'premium':
+                    result[dictionary[key]] = "Да" if value == "True" else "Нет"
+                case 'salary_from':
+                    salary_from = f"{int(float(value)):,}".replace(',', ' ')
+                case 'salary_to':
+                    salary_to = f"{int(float(value)):,}".replace(',', ' ')
+                case 'salary_gross':
+                    salary_gross = "Без вычета налогов" if value == "True" else "С вычетом налогов"
+                case 'salary_currency':
+                    salary_currency = currency[value]
+                case _:
+                    result[dictionary[key]] = value
 
-        if vacancy != vacancies[-1]:
-            print()
+        result["Оклад"] = f"{salary_from} - {salary_to} ({salary_currency}) ({salary_gross})"
+        result["Название региона"] = result.pop("Название региона")
+        result["Дата публикации вакансии"] = result.pop("Дата публикации вакансии")
 
-def formatter(row):
-    result = {}
+        formatted_vacancies.append(result)
 
-    for key, value in row.items():
-        value = value.rstrip()
+    return formatted_vacancies
 
-        match key:
-            case 'key_skills':
-                result[key] = ', '.join(value.split('\n'))
-            case 'experience_id':
-                result[key] = work_experience[value]
-            case 'premium':
-                result[key] = "Да" if value == "True" else "Нет"
-            case 'salary_from' | 'salary_to':
-                result[key] = '{0:,}'.format(int(float(value))).replace(',', ' ')
-            case 'salary_gross':
-                result[key] = "Без вычета налогов" if value == "True" else "С вычетом налогов"
-            case 'salary_currency':
-                result[key] = currency[value]
-            case _:
-                result[key] = value
-    
-    result['salary'] = f"{result.pop('salary_from')} - {result.pop('salary_to')} ({result.pop('salary_currency')}) ({result.pop('salary_gross')})"
-    result['area_name'] = result.pop('area_name')
-    result['published_at'] = result.pop('published_at')
-    
-    return result
+def create_table(vacancies: list):
+    table = PrettyTable()
+    table.field_names = ["№"] + [title for title in dictionary.values()]
+    table.max_width = 20
+    table.align = "l"
 
+    if len(vacancies):
+        fill_table(table, vacancies)
+    else:
+        table = "Нет данных"
 
+    return table
 
+def fill_table(table, vacancies):
+    for i in range(len(vacancies)):
+        row = [info if len(info) <= 100 else info[:100] + "..." for info in vacancies[i].values()]
+        number = i + 1
+        row.insert(0, number)
+        table.add_row(row, divider=True)
 
 def main():
-    vacancies, titles = сsv_reader(input())
-    print_vacancies(vacancies, titles)
+    file_name = input()
+    vacancies, titles = сsv_reader(file_name)
+    formatted_vacancies = formatter(vacancies, titles)
+    table = create_table(formatted_vacancies)
+    print(table)
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
