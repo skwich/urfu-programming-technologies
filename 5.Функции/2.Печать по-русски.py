@@ -77,10 +77,8 @@ def formatter(row):
                 result[key] = value
     
     result['salary'] = f"{result.pop('salary_from')} - {result.pop('salary_to')} ({result.pop('salary_currency')}) ({result.pop('salary_gross')})"
-    area_name = result.pop('area_name')
-    published_at = result.pop('published_at')
-    result['area_name'] = area_name
-    result['published_at'] = published_at
+    result['area_name'] = result.pop('area_name')
+    result['published_at'] = result.pop('published_at')
     
     return result
 
