@@ -1,6 +1,11 @@
 import prettytable
 import csv
 
+with open("test.csv", encoding='utf_8') as f:
+    mytable = csv.Sniffer().sniff(f.readline())
+    mytable = prettytable.from_csv(mytable.)
+    print(mytable)
+
 dictionary = {
     "name": "Название",
     "description": "Описание",
@@ -83,5 +88,12 @@ def formatter(row):
     
     return result
 
-vacancies, titles = сsv_reader(input())
-print_vacancies(vacancies, titles)
+
+
+
+def main():
+    vacancies, titles = сsv_reader(input())
+    print_vacancies(vacancies, titles)
+
+# if __name__ == "__main__":
+#     main()
