@@ -8,10 +8,8 @@ def get_vacancies(func):
         vacancies_list, titles, filter_name, filter_text = func(*args)
         vacancies = []
         for row in vacancies_list:
-            vacancy = {}
-            for (key, value) in zip(titles, row):
-                vacancy[key] = value
-            vacancies.append(vacancy)
+            gen = {key:value for (key,value) in zip(titles, row)}
+            vacancies.append(gen)
         return vacancies, filter_name, filter_text
     return wrapper
 
@@ -28,8 +26,7 @@ def apply_filter(func):
             if filter_name == "Оклад":
                 salary = re.findall(r'\d+ \d+', vacancy[filter_name])
                 if len(salary):
-                    salary_from = salary[0].replace(' ', '')
-                    salary_to = salary[1].replace(' ', '')
+                    salary_from, salary_to = (lambda x: (x[0].replace(' ', ''),x[1].replace(' ', '')))(salary)
                     if int(salary_from) <= int(filter_text) and int(filter_text) <= int(salary_to):
                         new_vacancies_list.append(vacancy)
             elif filter_name == "Идентификатор валюты оклада":
