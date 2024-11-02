@@ -2,16 +2,14 @@ from prettytable import PrettyTable, ALL
 import csv
 
 def csv_reader(file_name):
-    vacancies = []
     with open(file_name, encoding='utf_8_sig') as csv_file:
         reader = csv.reader(csv_file)
         titles = next(reader)
+        vacancies = []
         for row in reader:
-            vacancy = {}
-            for (key, value) in zip(titles, row):
-                vacancy[key] = value if len(value) <= 100 else value[:100] + "..."
-            vacancies.append(vacancy)
-    return vacancies
+            gen = {key:value if len(value) <= 100 else value[:100] + "..." for (key,value) in zip(titles, row)}
+            vacancies.append(gen)
+        return vacancies
 
 #декоратор для форматирования таблицы
 def apply_format(func):
