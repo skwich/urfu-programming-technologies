@@ -14,12 +14,11 @@ class Vacancy:
         self.area_name      = vacancy[10]
         self.published_at   = vacancy[11]
 
-    
     def GetVacancyFields(self):
         return [
             self.name,
-            self.description if len(self.description) <= 100 else self.description[:100] + "...",
-            self.key_skills if len(self.key_skills) <= 100 else self.key_skills[:100] + "...",
+            Utils.format_data(self.description),
+            Utils.format_data(self.key_skills),
             self.experience_id,
             self.premium,
             self.employer_name,
@@ -60,6 +59,10 @@ class Utils:
         for i, vacancy in enumerate(dataset.vacancies, 1):
             table.add_row([i] + vacancy.GetVacancyFields())
         return table
+    
+    @staticmethod
+    def format_data(data):
+        return data if len(data) <= 100 else data[:100] + "..."
 
 
 def main():
