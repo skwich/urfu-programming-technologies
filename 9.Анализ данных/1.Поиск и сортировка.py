@@ -6,10 +6,11 @@ column = input()
 key = input()
 sort_by = input()
 sort_type = True if input() == 'asc' else False
+
 vacancies.index.name = 'IND'
-output = (vacancies
-    [vacancies[column].isin([key,key.lower(),key.upper()])]
+print(
+    vacancies
+    [vacancies[column].str.contains(key, case=False, na=False)]
     .sort_values(by=[sort_by, 'IND'], ascending=[sort_type, True])['name']
     .tolist()
 )
-print(output)
