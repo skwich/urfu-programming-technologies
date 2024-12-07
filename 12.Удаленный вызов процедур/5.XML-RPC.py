@@ -14,18 +14,20 @@ def get_vacancy_by_id(id):
 
 
 def get_vacancies_by_city(city):
-    global df
-    copy_df = df.copy(deep=True)
-    copy_df = copy_df[copy_df["city"] == city][["name", "from", "to", "city"]]
-    copy_df.columns = ["Название вакансии", "Зарплата от", "Зарплата до", "Город"]
-    d = copy_df.to_dict(orient="index")
-    return {str(key): value for (key, value) in d.items()}
+    return get_vacancies_by("city", city)
 
 
 def get_vacancies_by_min_salary(salary):
+    return get_vacancies_by("from", salary)
+
+
+def get_vacancies_by(by, param):
     global df
     copy_df = df.copy(deep=True)
-    copy_df = copy_df[copy_df["from"] >= salary][["name", "from", "to", "city"]]
+    if by == "city":
+        copy_df = copy_df[copy_df[by] == param][["name", "from", "to", "city"]]
+    else:
+        copy_df = copy_df[copy_df[by] >= param][["name", "from", "to", "city"]]
     copy_df.columns = ["Название вакансии", "Зарплата от", "Зарплата до", "Город"]
     d = copy_df.to_dict(orient="index")
     return {str(key): value for (key, value) in d.items()}

@@ -51,6 +51,3 @@ def start_server():
 
     client.close()
     server.close()
-
-
-start_server()
