@@ -50,10 +50,10 @@ df_area_salary = pd.read_sql(f"""
 
 
 df_area_count = pd.read_sql(f"""
-        SELECT area_name as 'Город', COUNT(area_name) / COUNT(*) as 'Доля вакансий'
+        SELECT area_name as 'Город', (COUNT(*) * 1.0 / (SELECT COUNT(*) FROM {table_name})) as 'Доля вакансий'
         FROM {table_name}
         GROUP BY Город
-        HAVING FLOOR(COUNT(*) / (SELECT COUNT(*) FROM {table_name})) >= 1
-        ORDER BY 'Доля вакансий' DESC
+        HAVING FLOOR(COUNT(*) / (SELECT COUNT(*) * 0.008 FROM {table_name})) >= 1
+        ORDER BY COUNT(*) / (SELECT COUNT(*) * 0.008 FROM {table_name}) DESC
         LIMIT 10
     """, conn)
