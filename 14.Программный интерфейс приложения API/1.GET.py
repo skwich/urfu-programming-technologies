@@ -1,19 +1,14 @@
 import requests
-import asyncio
-import json
 
 area_name = input()
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8000/vacancies"
 vac_id = 1
 
-async def main():
-    while True:
-        res = await requests.get(f'{BASE_URL}/{vac_id}')
-        if "error" in res.text:
-            break
-        result = json.loads(res.text)
-        if area_name == str(result.get('area_name')):
-            print(result)
-        vac_id += 1
-
-main()
+while True:
+    response = requests.get(f'{BASE_URL}/{vac_id}')
+    if "error" in response.text:
+        break
+    result = response.json()
+    if result['area_name'] == area_name:
+        print(result)
+    vac_id += 1
