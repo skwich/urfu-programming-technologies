@@ -1,23 +1,16 @@
 import pandas as pd
-import requests
-from io import StringIO
-from concurrent.futures import ThreadPoolExecutor
 
-start_date = pd.to_datetime('2003-01-01')
-end_date = pd.to_datetime('2024-11-01')
-dates_range = pd.date_range(start_date, end_date, freq='MS').to_list()
-BASE_URL = "https://www.cbr.ru/scripts/XML_daily.asp?date_req="
 list_of_rows = []
+list_of_charcodes = ["BYR","USD","EUR","KZT","UAH","AZN","KGS","UZS","GEL"]
 
-with ThreadPoolExecutor(10) as executor:
-    response = executor.map(requests.get, [f"{BASE_URL}{date.strftime('01/%m/%Y')}" for date in dates_range])
-    for data in response:
-        date = pd.to_datetime(data.url[data.url.find('=')+1:], dayfirst=True)
-        df = pd.read_xml(StringIO(data.text))
+for year in range(2003, 2024 + 1):
+    for month in range(1, 12 + 1 if year != 2024 else 11 + 1):
+        url = f"http://127.0.0.1:8000/scripts/XML_daily.asp?date_req=01/{month:02}/{year}&d=0"
+        df = pd.read_xml(url, encoding='cp1251')
         df = df[['CharCode', 'VunitRate']]
         df['VunitRate'] = df['VunitRate'].str.replace(',', '.').astype(float)
-        df = df[df['CharCode'].isin(["BYR","USD","EUR","KZT","UAH","AZN","KGS","UZS","GEL"])].set_index('CharCode').T
-        df.insert(0, 'date', date.strftime('%Y-%m'))
+        df = df[df['CharCode'].isin(list_of_charcodes)].set_index('CharCode').T
+        df.insert(0, 'date', f"{year}-{month:02}")
         list_of_rows.append(df.to_dict(orient='records')[0])
 
 result = pd.DataFrame(list_of_rows)
